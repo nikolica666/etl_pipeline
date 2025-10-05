@@ -1,3 +1,4 @@
+from text_utils.embedding_generator import EmbeddingGenerator
 from extractors.pdf_extractor import extract_pdf
 from extractors.word_extractor import extract_word
 from extractors.xlsx_extractor import extract_xlsx
@@ -6,9 +7,13 @@ from extractors.text_extractor import extract_txt
 from extractors.csv_extractor import extract_table
 from text_utils.cleaning import clean_text
 from text_utils.chunking import chunk_text
-from text_utils.embedding_generator import EmbeddingGenerator
+from text_utils.doc_id_generator import make_sanitized_doc_id
 from loaders.local_loader import save_chunks_with_embeddings
 import os
+import hashlib
+import unicodedata
+import re
+
 
 # Initialize embedding generator once
 embedder = EmbeddingGenerator()
@@ -41,22 +46,34 @@ def extract_text_from_file(file_path: str) -> str | None:
     except Exception as e:
         print(f"Error extracting text from {file_path}: {e}")
         return None
-        
+
 def process_document(file_path):
 
     text = extract_text_from_file(file_path)
     if not text:
         return
 
-    # TODO smarter chunking (keep sentences and/or paragraphs)
     # TODO preserve CSV/TSV table (better for LLM with preserved row structure)
     text = clean_text(text)
+    if not text.strip():
+        print(f"No usable text after cleaning in {file_path}, skipping.")
+        return
+
+    # TODO smarter chunking (keep sentences and/or paragraphs)
     chunks = chunk_text(text, chunk_size=500, overlap=50)
+    if not chunks:
+        print(f"No chunks generated from {file_path}, skipping.")
+        return
 
-    embeddings = embedder.generate(chunks)
+    try:
+        embeddings = embedder.generate(chunks)
+    except Exception as e:
+        print(f"Error generating embeddings for {file_path}: {e}")
+        return
 
-    doc_id = os.path.splitext(os.path.basename(file_path))[0]
-    save_chunks_with_embeddings(chunks, embeddings, doc_id,)
+    safe_doc_id = make_sanitized_doc_id(file_path)
+
+    save_chunks_with_embeddings(chunks, embeddings, safe_doc_id)
 
 if __name__ == "__main__":
     sample_folder = "/home/nikola/rag_temp/txt"
