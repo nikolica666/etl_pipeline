@@ -8,7 +8,7 @@ def process_any_document(source: str, keep_temp=False):
     """
     local_path, cleanup = fetch_file(source, keep=keep_temp)
     try:
-        process_document(str(local_path))
+        process_document(str(local_path), source)
     finally:
         cleanup()
 
