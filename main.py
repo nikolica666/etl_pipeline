@@ -13,14 +13,14 @@ def process_any_document(source: str, keep_temp=False):
         cleanup()
 
 if __name__ == "__main__":
-    """sample_folder = "/home/nikola/rag_temp/txt"
+    sample_folder = "/home/nikola/rag_temp/txt"
     count = 0
     for file in os.listdir(sample_folder):
         file_path = os.path.join(sample_folder, file)
         process_any_document(file_path)
         count = count + 1
     print(f"Processed {count} docs")
-    """
+    
     process_any_document("https://www.index.hr/")
     process_any_document("https://www.index.hr/vijesti/clanak/kod-sibenika-zena-kilometrima-vozila-na-felgama-policija-ju-uhitila/2716865.aspx?index_ref=naslovnica_vijesti_ostalo_d_0")
  

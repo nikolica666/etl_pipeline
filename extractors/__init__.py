@@ -31,6 +31,11 @@ EXTRACTORS = {
     # HTML
     ".html": extract_html,
     ".htm": extract_html,
+    ".aspx": extract_html,
+    ".php": extract_html,
+    ".jsp": extract_html,
+    ".cfm": extract_html,
+    
 }
 
 
