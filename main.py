@@ -1,85 +1,25 @@
-from text_utils.embedding_generator import EmbeddingGenerator
-from extractors.pdf_extractor import extract_pdf
-from extractors.word_extractor import extract_word
-from extractors.xlsx_extractor import extract_xlsx
-from extractors.pptx_extractor import extract_pptx
-from extractors.text_extractor import extract_txt
-from extractors.csv_extractor import extract_table
-from text_utils.cleaning import clean_text
-from text_utils.chunking import chunk_text
-from text_utils.doc_id_generator import make_sanitized_doc_id
-from loaders.local_loader import save_chunks_with_embeddings
 import os
-import hashlib
-import unicodedata
-import re
+from pipeline import process_document
+from fetchers import fetch_file
 
-
-# Initialize embedding generator once
-embedder = EmbeddingGenerator()
-
-def extract_text_from_file(file_path: str) -> str | None:
+def process_any_document(source: str, keep_temp=False):
     """
-    Extract text from a file based on its extension.
-
-    Returns None if the file type is unsupported or extraction fails.
+    Fetch (local or remote) and process a document.
     """
-    ext = os.path.splitext(file_path)[1].lower()
+    local_path, cleanup = fetch_file(source, keep=keep_temp)
     try:
-        if ext == ".pdf":
-            return extract_pdf(file_path)
-        elif ext in [".docx", ".doc"]:
-            return extract_word(file_path)
-        elif ext in [".xlsx", ".xls"]:
-            return extract_xlsx(file_path)
-        elif ext in [".pptx", ".ppt"]:
-            return extract_pptx(file_path)
-        elif ext in [".txt", ".md", ".log"]:
-            return extract_txt(file_path)
-        elif ext == ".csv":
-            return extract_table(file_path)
-        elif ext == ".tsv":
-            return extract_table(file_path, '\t')
-        else:
-            print(f"Unsupported file type: {ext}")
-            return None
-    except Exception as e:
-        print(f"Error extracting text from {file_path}: {e}")
-        return None
-
-def process_document(file_path):
-
-    text = extract_text_from_file(file_path)
-    if not text:
-        return
-
-    # TODO preserve CSV/TSV table (better for LLM with preserved row structure)
-    text = clean_text(text)
-    if not text.strip():
-        print(f"No usable text after cleaning in {file_path}, skipping.")
-        return
-
-    # TODO smarter chunking (keep sentences and/or paragraphs)
-    chunks = chunk_text(text, chunk_size=500, overlap=50)
-    if not chunks:
-        print(f"No chunks generated from {file_path}, skipping.")
-        return
-
-    try:
-        embeddings = embedder.generate(chunks)
-    except Exception as e:
-        print(f"Error generating embeddings for {file_path}: {e}")
-        return
-
-    safe_doc_id = make_sanitized_doc_id(file_path)
-
-    save_chunks_with_embeddings(chunks, embeddings, safe_doc_id)
+        process_document(str(local_path))
+    finally:
+        cleanup()
 
 if __name__ == "__main__":
-    sample_folder = "/home/nikola/rag_temp/txt"
+    """sample_folder = "/home/nikola/rag_temp/txt"
     count = 0
     for file in os.listdir(sample_folder):
         file_path = os.path.join(sample_folder, file)
-        process_document(file_path)
+        process_any_document(file_path)
         count = count + 1
     print(f"Processed {count} docs")
+    """
+    process_any_document("https://www.index.hr")
+ 
