@@ -13,24 +13,40 @@ import os
 # Initialize embedding generator once
 embedder = EmbeddingGenerator()
 
-def process_document(file_path):
+def extract_text_from_file(file_path: str) -> str | None:
+    """
+    Extract text from a file based on its extension.
+
+    Args:
+        file_path (str): Path to the input file.
+
+    Returns:
+        str | None: Extracted text content, or None if unsupported type.
+    """
     ext = os.path.splitext(file_path)[1].lower()
+
     if ext == ".pdf":
-        text = extract_pdf(file_path)
+        return extract_pdf(file_path)
     elif ext in [".docx", ".doc"]:
-        text = extract_word(file_path)
+        return extract_word(file_path)
     elif ext in [".xlsx", ".xls"]:
-        text = extract_xlsx(file_path)
+        return extract_xlsx(file_path)
     elif ext in [".pptx", ".ppt"]:
-        text = extract_pptx(file_path)
+        return extract_pptx(file_path)
     elif ext in [".txt", ".md", ".log"]:
-        text = extract_txt(file_path)
+        return extract_txt(file_path)
     elif ext == ".csv":
-        text = extract_table(file_path)
+        return extract_table(file_path)
     elif ext == ".tsv":
-        text = extract_table(file_path, '\t')
+        return extract_table(file_path, '\t')
     else:
         print(f"Unsupported file type: {ext}")
+        return None
+
+def process_document(file_path):
+    
+    text = extract_text_from_file(file_path)
+    if not text:
         return
 
     # TODO smarter chunking (keep sentences and/or paragraphs)
@@ -41,7 +57,7 @@ def process_document(file_path):
     embeddings = embedder.generate(chunks)
 
     doc_id = os.path.splitext(os.path.basename(file_path))[0]
-    save_chunks_with_embeddings(chunks, embeddings, doc_id, "build/output")
+    save_chunks_with_embeddings(chunks, embeddings, doc_id,)
 
 if __name__ == "__main__":
     sample_folder = "/home/nikola/rag_temp/txt"
