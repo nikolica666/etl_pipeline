@@ -21,5 +21,6 @@ if __name__ == "__main__":
         count = count + 1
     print(f"Processed {count} docs")
     """
-    process_any_document("https://www.index.hr")
+    process_any_document("https://www.index.hr/")
+    process_any_document("https://www.index.hr/vijesti/clanak/kod-sibenika-zena-kilometrima-vozila-na-felgama-policija-ju-uhitila/2716865.aspx?index_ref=naslovnica_vijesti_ostalo_d_0")
  
