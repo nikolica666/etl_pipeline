@@ -17,34 +17,33 @@ def extract_text_from_file(file_path: str) -> str | None:
     """
     Extract text from a file based on its extension.
 
-    Args:
-        file_path (str): Path to the input file.
-
-    Returns:
-        str | None: Extracted text content, or None if unsupported type.
+    Returns None if the file type is unsupported or extraction fails.
     """
     ext = os.path.splitext(file_path)[1].lower()
-
-    if ext == ".pdf":
-        return extract_pdf(file_path)
-    elif ext in [".docx", ".doc"]:
-        return extract_word(file_path)
-    elif ext in [".xlsx", ".xls"]:
-        return extract_xlsx(file_path)
-    elif ext in [".pptx", ".ppt"]:
-        return extract_pptx(file_path)
-    elif ext in [".txt", ".md", ".log"]:
-        return extract_txt(file_path)
-    elif ext == ".csv":
-        return extract_table(file_path)
-    elif ext == ".tsv":
-        return extract_table(file_path, '\t')
-    else:
-        print(f"Unsupported file type: {ext}")
+    try:
+        if ext == ".pdf":
+            return extract_pdf(file_path)
+        elif ext in [".docx", ".doc"]:
+            return extract_word(file_path)
+        elif ext in [".xlsx", ".xls"]:
+            return extract_xlsx(file_path)
+        elif ext in [".pptx", ".ppt"]:
+            return extract_pptx(file_path)
+        elif ext in [".txt", ".md", ".log"]:
+            return extract_txt(file_path)
+        elif ext == ".csv":
+            return extract_table(file_path)
+        elif ext == ".tsv":
+            return extract_table(file_path, '\t')
+        else:
+            print(f"Unsupported file type: {ext}")
+            return None
+    except Exception as e:
+        print(f"Error extracting text from {file_path}: {e}")
         return None
-
+        
 def process_document(file_path):
-    
+
     text = extract_text_from_file(file_path)
     if not text:
         return
