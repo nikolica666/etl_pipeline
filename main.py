@@ -16,8 +16,8 @@ def process_any_document(source: str, keep_temp=False):
     local_path, cleanup = fetch_file(source, keep=keep_temp)
     try:
         result = process_document(str(local_path), source, skip_if_duplicate=False)
-        status = result.get("status")
-        doc_id = result.get("doc_id")
+        status = result.status
+        doc_id = result.doc_id
         logger.info(f"Processed '{source}' with status '{status}' (doc_id={doc_id})")
         return result
     except Exception as e:
@@ -71,9 +71,9 @@ def collect_local_files(folder_path, recursive=False, extensions=None):
 
 def print_summary(results):
 
-    success = sum(1 for r in results if r.get("status") == "success")
-    skipped = sum(1 for r in results if r.get("status") == "skipped_duplicate")
-    failed = sum(1 for r in results if r.get("status") not in ("success", "skipped_duplicate"))
+    success = sum(1 for r in results if r.status == "success")
+    skipped = sum(1 for r in results if r.status == "skipped_duplicate")
+    failed = sum(1 for r in results if r.status not in ("success", "skipped_duplicate"))
 
     logger.info("Processing summary:")
     logger.info(f"  ✅ Success: {success}")
