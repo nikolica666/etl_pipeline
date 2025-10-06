@@ -26,7 +26,7 @@ class EmbeddingGenerator:
                 logger.info(f"Loading embedding model '{model_name}' on {device}")
                 EmbeddingGenerator._model_instance = SentenceTransformer(model_name, device=device)
             else:
-                logger.debug("Reusing already loaded SentenceTransformer model")
+                logger.info("Reusing already loaded SentenceTransformer model")
 
         self.model = EmbeddingGenerator._model_instance
 

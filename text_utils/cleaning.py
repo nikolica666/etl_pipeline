@@ -75,8 +75,5 @@ def clean_text(text):
     # THIS WILL REMOVE SUBSCRIPTS/SUPERSCRIPTS - NOT USING ATM
     # text = unicodedata.normalize("NFKC", text)
 
-    # 10. Remove universal PDF page markers like [PAGE 11]
-    text = re.sub(r'\[PAGE \d+\]', '', text)
-
     return text.strip()
 

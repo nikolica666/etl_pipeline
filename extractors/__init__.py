@@ -10,6 +10,7 @@ from .html_extractor import extract_html
 
 
 EXTRACTORS = {
+    
     # Office & PDF
     ".pdf": extract_pdf,
     ".docx": extract_word,
@@ -35,7 +36,7 @@ EXTRACTORS = {
     ".php": extract_html,
     ".jsp": extract_html,
     ".cfm": extract_html,
-    
+
 }
 
 
