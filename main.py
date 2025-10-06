@@ -69,6 +69,17 @@ def collect_local_files(folder_path, recursive=False, extensions=None):
     logger.info(f"Collected {len(collected)} files from '{folder_path}' (recursive={recursive})")
     return collected
 
+def print_summary(results):
+    
+    success = sum(1 for r in results if r.get("status") == "success")
+    skipped = sum(1 for r in results if r.get("status") == "skipped_duplicate")
+    failed = sum(1 for r in results if r.get("status") not in ("success", "skipped_duplicate"))
+
+    logger.info("Processing summary:")
+    logger.info(f"  ✅ Success: {success}")
+    logger.info(f"  ⏭️  Skipped duplicates: {skipped}")
+    logger.info(f"  ❌ Failed: {failed}")
+    logger.info(f"  Total processed: {len(results)}")
 
 if __name__ == "__main__":
     
@@ -98,13 +109,4 @@ if __name__ == "__main__":
             except Exception as e:
                 logger.error(f"❌ Error processing {src}: {e}")
 
-    # --- Summary ---
-    success = sum(1 for r in results if r.get("status") == "success")
-    skipped = sum(1 for r in results if r.get("status") == "skipped_duplicate")
-    failed = sum(1 for r in results if r.get("status") not in ("success", "skipped_duplicate"))
-
-    print(f"\nSummary:")
-    print(f"  ✅ Success: {success}")
-    print(f"  ⏭️  Skipped duplicates: {skipped}")
-    print(f"  ❌ Failed: {failed}")
-    print(f"  Total processed: {len(results)}")
+    print_summary(results)
