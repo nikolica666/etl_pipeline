@@ -70,7 +70,7 @@ def collect_local_files(folder_path, recursive=False, extensions=None):
     return collected
 
 def print_summary(results):
-    
+
     success = sum(1 for r in results if r.get("status") == "success")
     skipped = sum(1 for r in results if r.get("status") == "skipped_duplicate")
     failed = sum(1 for r in results if r.get("status") not in ("success", "skipped_duplicate"))
