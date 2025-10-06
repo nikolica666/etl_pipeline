@@ -41,7 +41,12 @@ except Exception as e:
     logger.error(f"Failed to create HASH_DIR '{HASH_DIR}': {e}")
 
 
-def process_document(local_path, source=None, skip_if_duplicate=True):
+def process_document(
+    local_path: str,
+    source: str | None = None,
+    skip_if_duplicate: bool = True
+) -> dict[str, str | int | None]:
+
     """
     Extract, clean, chunk, embed, and save text from a given local document file.
     Optionally, preserve the original source (URL or file path) for traceability.
@@ -94,7 +99,7 @@ def process_document(local_path, source=None, skip_if_duplicate=True):
     hash_marker = os.path.join(HASH_DIR, f"{doc_hash}.done")
 
     if skip_if_duplicate and os.path.exists(hash_marker):
-        logger.info(f"Skipping duplicate document: {local_path}")
+        logger.info(f"Skipping duplicate document (hash={doc_hash[:10]}...) at {local_path}")
         result["status"] = "skipped_duplicate"
         return result
 
@@ -114,8 +119,8 @@ def process_document(local_path, source=None, skip_if_duplicate=True):
         return result
 
     # --- Step 6: Document metadata ---
-    safe_doc_id = make_sanitized_doc_id(source or local_path)
-    result["doc_id"] = safe_doc_id
+    doc_id = make_sanitized_doc_id(source or local_path)
+    result["doc_id"] = doc_id
 
     metadata = {
         "source": source or local_path,
@@ -126,14 +131,14 @@ def process_document(local_path, source=None, skip_if_duplicate=True):
 
     # --- Step 7: Save results ---
     try:
-        save_chunks_with_embeddings(chunks, embeddings, safe_doc_id, metadata=metadata)
+        save_chunks_with_embeddings(chunks, embeddings, doc_id, metadata=metadata)
         result["num_chunks"] = len(chunks)
         result["status"] = "success"
 
         if skip_if_duplicate:
             open(hash_marker, "w").close()
 
-        logger.info(f"✅ Processed {local_path} → {len(chunks)} chunks, doc_id={safe_doc_id}")
+        logger.info(f"✅ Processed {local_path} → {len(chunks)} chunks, doc_id={doc_id}")
 
     except Exception as e:
         logger.error(f"Error saving data for {local_path}: {e}", exc_info=True)
