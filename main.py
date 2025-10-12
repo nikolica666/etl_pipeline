@@ -81,6 +81,19 @@ def process_any_document(source: str, keep_temp: bool = False, store: VectorDBSt
     finally:
         cleanup()
 
+def calculate_max_workers(len_of_sources):
+    """
+        Count CPU threads (or fallback to 4)
+
+        max_workers = cpu_threads - 2 
+        
+        If number of source files to process is less then that, 
+        fallback to max_workers = len_of_sources
+    """
+    cpu_threads = os.cpu_count() or 4
+    max_workers = min(cpu_threads - 2, len_of_sources)
+    logger.info(f"🚀 Calculated parallel processing with {max_workers} workers (CPU has {cpu_threads} threads)")
+
 if __name__ == "__main__":
 
     # --- DB setup ---
@@ -95,8 +108,7 @@ if __name__ == "__main__":
     logger.info(f"📄 Found {len(sources)} sources to process")
 
     # --- Parallel processing ---
-    max_workers = min(4, len(sources))
-    logger.info(f"🚀 Starting parallel processing with {max_workers} workers")
+    max_workers = calculate_max_workers(len(sources))
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(process_any_document, src, False, store) for src in sources]
