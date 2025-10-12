@@ -46,3 +46,60 @@ vector_pipeline/
 | `EMBEDDING_MODEL`      | Name of the SentenceTransformer model      | `sentence-transformers/all-MiniLM-L6-v2` |
 | `EMBEDDING_DEVICE`     | Device for model inference (`cpu` or `cuda`) | `cpu`        |
 | `LOG_LEVEL`            | Logging level for the application          | `INFO`         |
+
+## Qdrant Setup
+
+Qdrant is an open-source vector database used to store and search embeddings.
+
+### 🧱 1. Run Qdrant with Docker
+
+Use the following command to start Qdrant locally and **keep data persisted** on disk:
+
+```bash
+docker run -d \
+  -p 6333:6333 \
+  -v $(pwd)/qdrant_storage:/qdrant/storage \
+  --name qdrant \
+  qdrant/qdrant
+
+### 🧱 2. Qdrant Docker Explanation
+
+| Option | Description |
+|--------|--------------|
+| `-d` | Run the container in detached (background) mode |
+| `-p 6333:6333` | Map Qdrant’s default port (6333) to your localhost |
+| `-v $(pwd)/qdrant_storage:/qdrant/storage` | Mount local folder `qdrant_storage/` for persistent data storage |
+| `--name qdrant` | Assign a name (`qdrant`) to the container for easier management |
+
+### 🧾 3. Verify Qdrant is Running
+
+Check the container status:
+```bash
+docker ps
+
+You should see a container named qdrant in the list. Then open your browser at:
+👉 http://localhost:6333/dashboard
+
+to confirm Qdrant is up and running.
+
+### 💾 4. Persistent storage
+
+All data (collections, embeddings, payloads) are stored in ```qdrant_storage/```
+
+This directory is created automatically in your project root and will survive container restarts.
+
+To completely remove Qdrant and its data:
+
+```bash
+docker stop qdrant && docker rm qdrant
+rm -rf qdrant_storage
+```
+
+### 🔄 5. Restarting Qdrant Later
+
+Once Qdrant is installed, you can easily start or stop it:
+
+```bash
+docker start qdrant     # start existing container
+docker stop qdrant      # stop it
+```
