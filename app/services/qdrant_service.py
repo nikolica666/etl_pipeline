@@ -4,7 +4,7 @@ from text_utils.embedding_generator import EmbeddingGenerator
 from pipeline import get_embedding_dimension
 
 embedding_size = get_embedding_dimension()
-qdrant, collection = setup_qdrant(embedding_size)
+qdrant, collection = setup_qdrant(embedding_size, create_if_missing=False)
 
 embedder = EmbeddingGenerator()
 

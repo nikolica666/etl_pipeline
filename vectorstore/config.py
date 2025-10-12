@@ -4,7 +4,7 @@ import os, logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def setup_qdrant(embedding_size: int):
+def setup_qdrant(embedding_size: int, create_if_missing: bool = True):
 
     qdrant_host = os.getenv("QDRANT_HOST", "localhost")
     qdrant_port = int(os.getenv("QDRANT_PORT", "6333"))
