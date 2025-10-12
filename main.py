@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     # --- Source setup ---
     local_files = collect_local_files("/home/nikola/rag_temp", recursive=True)
-    urls = collect_urls_from("https://www.index.hr/", domain="index.hr")
+    urls = collect_urls_from("https://www.index.hr/", domain="index.hr") | collect_urls_from("https://www.24sata.hr/", domain="24sata.hr")
     
     sources = urls | set(local_files)
     logger.info(f"📄 Found {len(sources)} sources to process")
