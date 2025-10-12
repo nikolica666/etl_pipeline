@@ -101,7 +101,7 @@ docker start qdrant     # start existing container
 docker stop qdrant      # stop it
 ```
 
-## 🧩 1. Start the REST API
+### API setup
 
 After completing ingestion and ensuring Qdrant is running, start the FastAPI service with:
 
@@ -109,17 +109,13 @@ After completing ingestion and ensuring Qdrant is running, start the FastAPI ser
 uvicorn main_api:app --reload
 ```
 
-Explanation:
-
-main_api → the filename of your API entrypoint (main_api.py)
-
-app → the FastAPI instance created inside that file
-
---reload → automatically restarts the server when code changes (useful in development)
+```main_api``` → the filename of your API entrypoint (main_api.py)
+```app``` → the FastAPI instance created inside that file
+```--reload``` → automatically restarts the server when code changes (useful in development)
 
 By default, the API will start on http://127.0.0.1:8000
 
-## 📘 2. Access API Documentation
+## 📘 1. Access API Documentation
 
 Once the API is running, open your browser and navigate to:
 
@@ -131,7 +127,7 @@ There’s also an alternative documentation view at:
 
 👉 [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-## 🔎 3. Send a Test Query
+## 🔎 2. Send a Test Query
 
 In the Swagger UI, locate the `/api/search` endpoint and click **"Try it out"**.
 
