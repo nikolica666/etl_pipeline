@@ -1,9 +1,9 @@
-from qdrant_client import QdrantClient
 from db_store import VectorDBStore
 from pipeline import process_document, get_embedding_dimension
 from fetchers import fetch_file
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from extractors.html_extractor import collect_urls
+from vectorstore.config import setup_qdrant
 import os, logging, requests
 
 logging.basicConfig(level=logging.INFO)
@@ -11,26 +11,6 @@ logger = logging.getLogger(__name__)
 
 embedding_size = get_embedding_dimension()
 
-def setup_qdrant(embedding_size: int):
-
-    qdrant_host = os.getenv("QDRANT_HOST", "localhost")
-    qdrant_port = int(os.getenv("QDRANT_PORT", "6333"))
-    collection = os.getenv("QDRANT_COLLECTION", "documents")
-
-    qdrant = QdrantClient(host=qdrant_host, port=qdrant_port)
-
-    existing = [c.name for c in qdrant.get_collections().collections]
-    if collection not in existing:
-        qdrant.recreate_collection(
-            collection_name=collection,
-            vectors_config={"size": embedding_size, "distance": "Cosine"},
-        )
-        logger.info(f"✅ Created collection '{collection}'")
-    else:
-        logger.info(f"ℹ️ Collection '{collection}' already exists")
-
-    return qdrant, collection
- 
 def _should_include_file(path, extensions):
     """
     Helper to check if file should be included based on extension filter.

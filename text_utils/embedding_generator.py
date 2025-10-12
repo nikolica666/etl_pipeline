@@ -56,3 +56,6 @@ class EmbeddingGenerator:
         except Exception as e:
             logger.error(f"Error generating embeddings: {e}", exc_info=True)
             raise
+
+    def generate_single(self, text: str):
+        return self.generate([text])[0]
