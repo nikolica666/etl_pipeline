@@ -110,7 +110,9 @@ uvicorn main_api:app --reload
 ```
 
 ```main_api``` → the filename of your API entrypoint (main_api.py)
+
 ```app``` → the FastAPI instance created inside that file
+
 ```--reload``` → automatically restarts the server when code changes (useful in development)
 
 By default, the API will start on http://127.0.0.1:8000
