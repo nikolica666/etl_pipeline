@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from pathlib import Path
 from typing import List, Dict, Any
-
+from urllib.parse import urljoin, urlparse
 
 def extract_html(file_path: str, mode: str = "naive") -> str:
     """
@@ -94,3 +94,38 @@ def _extract_html_smart(file_path: str) -> str:
 
     text = "\n".join(line.strip() for line in lines if line.strip())
     return text.strip()
+
+def collect_urls(base_url: str, html: str, domain_limit: str = None) -> set[str]:
+    """
+    Extracts and normalizes all unique URLs from an HTML page.
+    
+    :param base_url: URL of the page being parsed (for resolving relative links)
+    :param html: Raw HTML text
+    :param domain_limit: Optional domain (e.g. 'index.hr') to restrict results
+    :return: Set of absolute URLs
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    urls = set()
+
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+
+        # Skip anchors, javascript, mailto, tel, etc.
+        if not href or href.startswith(("#", "javascript:", "mailto:", "tel:")):
+            continue
+
+        # Resolve relative URLs
+        absolute = urljoin(base_url, href)
+
+        # Normalize (remove fragments)
+        parsed = urlparse(absolute)
+        normalized = parsed._replace(fragment="").geturl()
+
+        # Restrict by domain if specified
+        if domain_limit:
+            if parsed.netloc and not parsed.netloc.endswith(domain_limit):
+                continue
+
+        urls.add(normalized)
+
+    return urls

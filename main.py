@@ -3,13 +3,34 @@ from db_store import VectorDBStore
 from pipeline import process_document, get_embedding_dimension
 from fetchers import fetch_file
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import os, logging
+from extractors.html_extractor import collect_urls
+import os, logging, requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 embedding_size = get_embedding_dimension()
 
+def setup_qdrant(embedding_size: int):
+
+    qdrant_host = os.getenv("QDRANT_HOST", "localhost")
+    qdrant_port = int(os.getenv("QDRANT_PORT", "6333"))
+    collection = os.getenv("QDRANT_COLLECTION", "documents")
+
+    qdrant = QdrantClient(host=qdrant_host, port=qdrant_port)
+
+    existing = [c.name for c in qdrant.get_collections().collections]
+    if collection not in existing:
+        qdrant.recreate_collection(
+            collection_name=collection,
+            vectors_config={"size": embedding_size, "distance": "Cosine"},
+        )
+        logger.info(f"✅ Created collection '{collection}'")
+    else:
+        logger.info(f"ℹ️ Collection '{collection}' already exists")
+
+    return qdrant, collection
+ 
 def _should_include_file(path, extensions):
     """
     Helper to check if file should be included based on extension filter.
@@ -53,6 +74,13 @@ def collect_local_files(folder_path, recursive=False, extensions=None):
     logger.info(f"Collected {len(collected)} files from '{folder_path}' (recursive={recursive})")
     return collected
 
+ def collect_urls_from(base_url, domain=None, user_agent="MyCrawler/1.0"):
+    """Fetch a URL and extract all links from it."""
+    headers = {"User-Agent": user_agent}
+    response = requests.get(base_url, headers=headers, timeout=10)
+    response.raise_for_status()
+    return collect_urls(base_url, response.text, domain_limit=domain)
+
 def process_any_document(source: str, keep_temp: bool = False, store: VectorDBStore | None = None):
     """
     Fetch (local or remote) and process a document, then upload it to VectorDB.
@@ -74,31 +102,16 @@ def process_any_document(source: str, keep_temp: bool = False, store: VectorDBSt
         cleanup()
 
 if __name__ == "__main__":
-    # --- Qdrant setup ---
-    qdrant_host = os.getenv("QDRANT_HOST", "localhost")
-    qdrant_port = int(os.getenv("QDRANT_PORT", "6333"))
-    collection = os.getenv("QDRANT_COLLECTION", "documents")
 
-    qdrant = QdrantClient(host=qdrant_host, port=qdrant_port)
-
-    # Ensure collection exists
-    existing_collections = [c.name for c in qdrant.get_collections().collections]
-    if collection not in existing_collections:
-        qdrant.recreate_collection(
-            collection_name=collection,
-            vectors_config={"size": embedding_size, "distance": "Cosine"}, # Embedding size is known from pipeline - check if refactoring is better
-        )
-        logger.info(f"✅ Created Qdrant collection '{collection}'")
-
+    # --- DB setup ---
+    qdrant, collection = setup_qdrant(embedding_size)
     store = VectorDBStore(qdrant, collection)
 
     # --- Source setup ---
     local_files = collect_local_files("/home/nikola/rag_temp", recursive=True)
-    urls = [
-        "https://www.index.hr/",
-        "https://www.index.hr/vijesti/clanak/kod-sibenika-zena-kilometrima-vozila-na-felgama-policija-ju-uhitila/2716865.aspx?index_ref=naslovnica_vijesti_ostalo_d_0",
-    ]
-    sources = local_files + urls
+    urls = collect_urls_from("https://www.index.hr/", domain="index.hr")
+    
+    sources = urls | set(local_files)
     logger.info(f"📄 Found {len(sources)} sources to process")
 
     # --- Parallel processing ---
