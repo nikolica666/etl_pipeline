@@ -74,7 +74,7 @@ def collect_local_files(folder_path, recursive=False, extensions=None):
     logger.info(f"Collected {len(collected)} files from '{folder_path}' (recursive={recursive})")
     return collected
 
- def collect_urls_from(base_url, domain=None, user_agent="MyCrawler/1.0"):
+def collect_urls_from(base_url, domain=None, user_agent="MyCrawler/1.0"):
     """Fetch a URL and extract all links from it."""
     headers = {"User-Agent": user_agent}
     response = requests.get(base_url, headers=headers, timeout=10)
