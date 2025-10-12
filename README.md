@@ -61,7 +61,7 @@ docker run -d \
   -v $(pwd)/qdrant_storage:/qdrant/storage \
   --name qdrant \
   qdrant/qdrant
-
+```
 ### 🧱 2. Qdrant Docker Explanation
 
 | Option | Description |
@@ -76,7 +76,7 @@ docker run -d \
 Check the container status:
 ```bash
 docker ps
-
+```
 You should see a container named qdrant in the list. Then open your browser at:
 👉 http://localhost:6333/dashboard
 
