@@ -4,7 +4,7 @@ from urllib.parse import urljoin, urlparse
 from xml.etree import ElementTree as ET
 import logging, gzip, requests
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def extract_urls_from_sitemap(source: str, timeout: int = 15) -> Dict[str, Set[str]]:
