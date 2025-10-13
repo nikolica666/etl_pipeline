@@ -3,6 +3,9 @@ from typing import List
 import numpy as np
 import json
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def save_chunks_with_embeddings(chunks, embeddings, doc_id, output_folder="build/output", metadata=None):
     """
     Save text chunks and embeddings as JSON, with optional metadata.
@@ -24,4 +27,5 @@ def save_chunks_with_embeddings(chunks, embeddings, doc_id, output_folder="build
     output_path = Path(output_folder) / f"{doc_id}_chunks.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"Saved {len(chunks)} chunks with embeddings to {output_path}")
+
+    log.info(f"Saved {len(chunks)} chunks with embeddings to {output_path}")
