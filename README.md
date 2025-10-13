@@ -8,15 +8,23 @@ Embedding-based document search using Sentence Transformers + Qdrant.
 ## Project Structure
 
 <pre>
+
 vector_pipeline/
-├── main.py                  (ingestion entrypoint)
-├── main_api.py              (FastAPI API entrypoint)
+├── main.py                  # 🧩 Ingestion / vectorization entrypoint
+├── main_api.py              # 🌐 FastAPI REST service
+├── main_crawler.py          # 🕷️ CLI entrypoint for crawling HTML sources
 │
 ├── app/
 │   ├── api/
 │   │   └── routes.py
 │   └── models/
 │       └── query_models.py
+│
+├── crawler/                 # 🕸️ Website discovery & crawling
+│   ├── __init__.py
+│   ├── crawler.py           # Orchestrates sitemap discovery + fetching + extraction
+│   ├── sitemap_utils.py     # Handles robots.txt + sitemap parsing
+│   └── link_extractor.py    # Extracts <a> href links from HTML
 │
 ├── embeddings/
 │   └── embedding_generator.py
