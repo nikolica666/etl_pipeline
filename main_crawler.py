@@ -11,7 +11,7 @@ def main():
     parser.add_argument("url", help="Base URL to crawl, e.g. https://www.index.hr")
     parser.add_argument("--limit", type=int, default=10, help="Max number of pages to crawl per domain")
     parser.add_argument("--delay", type=float, default=1.0, help="Delay between requests (seconds)")
-    parser.add_argument("--output", default="data", help="Output directory for extracted text")
+    parser.add_argument("--output", default="output/crawler-data", help="Output directory for extracted text")
     
     args = parser.parse_args()
 
