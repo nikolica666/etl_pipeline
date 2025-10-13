@@ -10,6 +10,7 @@ Embedding-based document search using Sentence Transformers + Qdrant.
 <pre>
 
 vector_pipeline/
+│
 ├── main.py                  # 🧩 Ingestion / vectorization entrypoint
 ├── main_api.py              # 🌐 FastAPI REST service
 ├── main_crawler.py          # 🕷️ CLI entrypoint for crawling HTML sources
